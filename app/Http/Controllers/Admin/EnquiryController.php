@@ -43,8 +43,19 @@ class EnquiryController extends Controller
     {
         $enquiry->load(['samples.items.labTest', 'items', 'trackingUpdates.user', 'invoices', 'coa', 'company', 'customer', 'pricedBy']);
 
+        $nextStep = match ($enquiry->status) {
+            'submitted' => ['info', 'Step 1 — Check the prices below (calculated from the standard price list), amend if a discount applies, then click “Save & Send Quotation”.'],
+            'quoted' => ['info', 'Quotation '.$enquiry->quotation_number.' was emailed on '.optional($enquiry->quoted_at)->format('d M Y').'. Waiting for the customer to approve or decline. You can still revise and re-send it, or record the customer’s reply yourself.'],
+            'approved' => ['primary', 'Approved — Sample Submission Form '.$enquiry->ssf_number.' was generated and emailed. When the samples arrive, update the tracking status (e.g. “Sample Received – via Courier”).'],
+            'declined' => ['secondary', 'The customer declined this quotation. The process has ended — no further transactions are possible.'],
+            'sample_received', 'in_progress', 'on_hold' => ['warning', 'Samples are in the lab. Keep the tracking status up to date; enter results under “COA / Results” when testing is complete.'],
+            'completed', 'reported', 'dispatched' => ['success', 'Testing is complete. Release the COA and generate the invoice if not done yet.'],
+            default => null,
+        };
+
         return view('admin.enquiries.show', [
             'enquiry' => $enquiry,
+            'nextStep' => $nextStep,
             'trackingStatuses' => TrackingStatus::where('is_manual', true)->where('is_active', true)->orderBy('sort_order')->get(),
             'companies' => Company::where('is_active', true)->orderBy('name')->get(['id', 'name', 'discount_percent', 'payment_terms', 'currency']),
             'testsJson' => PublicEnquiryController::testsForPicker(),

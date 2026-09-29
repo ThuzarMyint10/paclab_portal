@@ -36,19 +36,8 @@
 </div>
 
 {{-- What to do next --}}
-@php
-    $next = match ($e->status) {
-        'submitted' => ['info', 'Step 1 — Check the prices below (calculated from the standard price list), amend if a discount applies, then click “Save & Send Quotation”.'],
-        'quoted' => ['info', 'Quotation '.$e->quotation_number.' was emailed on '.optional($e->quoted_at)->format('d M Y').'. Waiting for the customer to approve or decline. You can still revise and re-send it, or record the customer’s reply yourself.'],
-        'approved' => ['primary', 'Approved — Sample Submission Form '.$e->ssf_number.' was generated and emailed. When the samples arrive, update the tracking status (e.g. “Sample Received – via Courier”).'],
-        'declined' => ['secondary', 'The customer declined this quotation. The process has ended — no further transactions are possible.'],
-        'sample_received', 'in_progress', 'on_hold' => ['warning', 'Samples are in the lab. Keep the tracking status up to date; enter results under “COA / Results” when testing is complete.'],
-        'completed', 'reported', 'dispatched' => ['success', 'Testing is complete. Release the COA and generate the invoice if not done yet.'],
-        default => null,
-    };
-@endphp
-@if ($next)
-    <div class="alert alert-{{ $next[0] }} py-2">{{ $next[1] }}</div>
+@if ($nextStep)
+    <div class="alert alert-{{ $nextStep[0] }} py-2">{{ $nextStep[1] }}</div>
 @endif
 @if ($e->decline_reason)
     <div class="alert alert-secondary py-2"><strong>Decline reason:</strong> {{ $e->decline_reason }}</div>

@@ -22,7 +22,7 @@
     </div>
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
-            <thead><tr><th>Reference</th><th>Submitted</th><th>Quotation</th><th>Samples</th><th class="text-end">Amount</th><th>Status</th><th></th></tr></thead>
+            <thead><tr><th>Reference</th><th>Submitted</th><th>Quotation</th><th>Samples</th><th>Status</th><th></th></tr></thead>
             <tbody>
             @forelse ($enquiries as $e)
                 <tr>
@@ -30,7 +30,6 @@
                     <td>{{ $e->created_at->format('d M Y') }}</td>
                     <td>{{ $e->quotation_number ?: '—' }}</td>
                     <td>{{ $e->items_count }} test(s)</td>
-                    <td class="text-end">{{ $e->quotation_number ? $e->money($e->total) : '—' }}</td>
                     <td>@include('partials.status-badge', ['enquiry' => $e])</td>
                     <td class="text-end">
                         <a href="{{ route('portal.enquiries.show', $e) }}" class="btn btn-sm {{ $e->status === 'quoted' ? 'btn-green' : 'btn-outline-secondary' }}">
@@ -39,7 +38,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="7" class="text-center text-muted py-4">No enquiries yet. <a href="{{ route('enquiry.create') }}">Submit your first price request</a>.</td></tr>
+                <tr><td colspan="6" class="text-center text-muted py-4">No enquiries yet. <a href="{{ route('enquiry.create') }}">Submit your first price request</a>.</td></tr>
             @endforelse
             </tbody>
         </table>

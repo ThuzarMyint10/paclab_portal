@@ -91,17 +91,24 @@ class EnquiryController extends Controller
         ]);
     }
 
-    /** Compact list for the test dropdowns: category → test → matrix/method with SGD & USD prices */
-    public static function testsForPicker(): array
+    /** Public test picker data contains names and descriptions only. Staff screens may request prices. */
+    public static function testsForPicker(bool $includePrices = false): array
     {
         return LabTest::where('is_active', true)->orderBy('sort_order')->orderBy('id')->get()
-            ->map(fn ($t) => [
-                'id' => $t->id,
-                'c' => $t->category,
-                'n' => $t->name,
-                'mm' => $t->matrix_method,
-                'sgd' => (float) $t->price_sgd,
-                'usd' => (float) $t->price_usd,
-            ])->values()->all();
+            ->map(function ($t) use ($includePrices) {
+                $test = [
+                    'id' => $t->id,
+                    'c' => $t->category,
+                    'n' => $t->name,
+                    'mm' => $t->matrix_method,
+                ];
+
+                if ($includePrices) {
+                    $test['sgd'] = (float) $t->price_sgd;
+                    $test['usd'] = (float) $t->price_usd;
+                }
+
+                return $test;
+            })->values()->all();
     }
 }

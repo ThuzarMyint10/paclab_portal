@@ -1,11 +1,11 @@
-@extends('layouts.public')
+﻿@extends('layouts.public')
 @section('title', 'New Price Request')
 @section('content')
 @php($p = $prefill)
 <div class="mb-4">
     <div class="section-title">New price request</div>
     <h2 class="text-navy mb-1">Request a quotation</h2>
-    <p class="text-muted mb-0">Fill in your details, add your samples and choose the tests. Prices shown are our standard 2026 list prices — your formal quotation (including any agreed discount) will be emailed to you.</p>
+    <p class="text-muted mb-0">Fill in your details, add your samples and choose the tests. Our team will review your request and email you a formal quotation.</p>
 </div>
 
 <form method="POST" action="{{ route('enquiry.store') }}" id="enquiryForm" novalidate>
@@ -71,11 +71,11 @@
                             <div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="turnaround" id="taStd" value="standard" {{ $ta === 'standard' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="taStd">Standard (7–9 working days)</label>
+                                    <label class="form-check-label" for="taStd">Standard (7â€“9 working days)</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="turnaround" id="taUrg" value="urgent" {{ $ta === 'urgent' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="taUrg">Urgent (+{{ \App\Models\Setting::get('urgent_surcharge_percent') }}%, no discount)</label>
+                                    <label class="form-check-label" for="taUrg">Urgent</label>
                                 </div>
                             </div>
                         </div>
@@ -115,7 +115,7 @@
                 <div class="card-header"><span class="badge bg-navy me-2">3</span>Special instructions &amp; submit</div>
                 <div class="card-body">
                     <label class="form-label">Special instructions / notes</label>
-                    <textarea name="special_instructions" class="form-control mb-3" rows="3" placeholder="e.g. send pictures of samples on receipt, separate reports per sample…">{{ old('special_instructions') }}</textarea>
+                    <textarea name="special_instructions" class="form-control mb-3" rows="3" placeholder="e.g. send pictures of samples on receipt, separate reports per sampleâ€¦">{{ old('special_instructions') }}</textarea>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="declaration" value="1" id="declaration" {{ old('declaration') ? 'checked' : '' }}>
                         <label class="form-check-label small" for="declaration">
@@ -133,9 +133,7 @@
                     <div class="d-flex justify-content-between"><span>Sample lines</span><strong id="sumSamples">0</strong></div>
                     <div class="d-flex justify-content-between"><span>Tests selected</span><strong id="sumTests">0</strong></div>
                     <hr>
-                    <div class="d-flex justify-content-between"><span>Indicative list price</span><strong id="sumTotal">—</strong></div>
-                    <div class="small text-muted mt-1" id="urgentNote" style="display:none">+{{ \App\Models\Setting::get('urgent_surcharge_percent') }}% urgent surcharge will be added.</div>
-                    <p class="small text-muted mt-2 mb-3">Indicative only — the final price (including agreed discounts) will be on your formal quotation.</p>
+                    <p class="small text-muted mt-2 mb-3">Pricing will be provided in your formal quotation.</p>
                     <button class="btn btn-green w-100 btn-lg" type="submit">Submit enquiry</button>
                 </div>
             </div>
@@ -153,12 +151,12 @@
             <div class="row g-2">
                 <div class="col-md-6">
                     <label class="form-label required">Client sample ID / description</label>
-                    <input class="form-control f-description" required placeholder="e.g. Broiler Feed – Batch 26070302B">
+                    <input class="form-control f-description" required placeholder="e.g. Broiler Feed â€“ Batch 26070302B">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Sample type</label>
                     <select class="form-select f-sample_type">
-                        <option value="">—</option>
+                        <option value="">â€”</option>
                         @foreach (['Feed', 'Premix', 'Feed Additive', 'Pure Material', 'Raw Material', 'Food', 'Water', 'Oil / Fat', 'Milk / Dairy', 'Other'] as $t)
                             <option>{{ $t }}</option>
                         @endforeach
@@ -179,7 +177,7 @@
                 <div class="col-md-4">
                     <label class="form-label">Storage</label>
                     <select class="form-select f-storage">
-                        <option value="">—</option>
+                        <option value="">â€”</option>
                         @foreach (config('paclab.storage_options') as $o)
                             <option>{{ $o }}</option>
                         @endforeach
@@ -194,7 +192,7 @@
                         <select class="form-select form-select-sm pick-category"><option value="">All categories</option></select>
                     </div>
                     <div class="col-md-8">
-                        <input class="form-control form-control-sm pick-search" placeholder="Search test, e.g. Vitamin A, Aflatoxin, Protein…">
+                        <input class="form-control form-control-sm pick-search" placeholder="Search test, e.g. Vitamin A, Aflatoxin, Proteinâ€¦">
                     </div>
                     <div class="col-md-10">
                         <select class="form-select form-select-sm pick-test"></select>
@@ -204,7 +202,7 @@
                     </div>
                 </div>
                 <table class="table table-sm table-light-head mt-2 mb-0 tests-table">
-                    <thead><tr><th>Test</th><th>Matrix / Method</th><th class="text-end">Unit price</th><th></th></tr></thead>
+                    <thead><tr><th>Test</th><th>Matrix / Method</th><th></th></tr></thead>
                     <tbody></tbody>
                 </table>
                 <div class="small text-danger no-tests mt-1">No tests selected yet.</div>
@@ -225,9 +223,6 @@
     const tpl = document.getElementById('sampleTpl');
     let counter = 0;
 
-    const currency = () => document.querySelector('input[name=currency]:checked')?.value || 'SGD';
-    const priceOf = t => currency() === 'USD' ? t.usd : t.sgd;
-    const fmt = n => (currency() === 'USD' ? 'US$' : 'S$') + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 
     function fillTests(card) {
@@ -236,7 +231,7 @@
         const sel = card.querySelector('.pick-test');
         const list = TESTS.filter(t => (!cat || t.c === cat) && (!q || (t.n + ' ' + t.mm + ' ' + t.c).toLowerCase().includes(q)));
         sel.innerHTML = list.length
-            ? list.map(t => `<option value="${t.id}">${esc(t.n)}${t.mm ? ' — ' + esc(t.mm) : ''} (${fmt(priceOf(t))})</option>`).join('')
+            ? list.map(t => `<option value="${t.id}">${esc(t.n)}</option>`).join('')
             : '<option value="">No matching tests</option>';
     }
 
@@ -251,8 +246,7 @@
         tr.dataset.test = id;
         tr.innerHTML = `<td>${esc(t.n)}<input type="hidden" name="samples[${idx}][tests][${k}][lab_test_id]" value="${id}"></td>
             <td class="small text-muted">${esc(t.mm)}</td>
-            <td class="text-end price-cell"></td>
-            <td class="text-end"><button type="button" class="btn btn-sm btn-link text-danger p-0 remove-test">✕</button></td>`;
+            <td class="text-end"><button type="button" class="btn btn-sm btn-link text-danger p-0 remove-test">âœ•</button></td>`;
         tbody.appendChild(tr);
         tr.querySelector('.remove-test').onclick = () => { tr.remove(); refresh(); };
         refresh();
@@ -283,32 +277,18 @@
     }
 
     function refresh() {
-        let tests = 0, total = 0;
+        let tests = 0;
         [...wrap.children].forEach((card, i) => {
             card.querySelector('.sample-no').textContent = i + 1;
-            const qty = Math.max(1, parseInt(card.querySelector('.f-quantity').value || '1'));
             const rows = card.querySelectorAll('.tests-table tbody tr');
             card.querySelector('.no-tests').style.display = rows.length ? 'none' : '';
-            rows.forEach(tr => {
-                const t = byId[tr.dataset.test];
-                tr.querySelector('.price-cell').textContent = fmt(priceOf(t));
-                total += priceOf(t) * qty;
-                tests++;
-            });
+            tests += rows.length;
         });
         document.getElementById('sumSamples').textContent = wrap.children.length;
         document.getElementById('sumTests').textContent = tests;
-        document.getElementById('sumTotal').textContent = tests ? fmt(total) : '—';
-        const urgent = document.querySelector('input[name=turnaround]:checked')?.value === 'urgent';
-        document.getElementById('urgentNote').style.display = urgent ? '' : 'none';
     }
 
     document.getElementById('addSample').onclick = () => addSample();
-    document.querySelectorAll('input[name=currency]').forEach(r => r.onchange = () => {
-        [...wrap.children].forEach(fillTests);
-        refresh();
-    });
-    document.querySelectorAll('input[name=turnaround]').forEach(r => r.onchange = refresh);
 
     document.getElementById('enquiryForm').addEventListener('submit', e => {
         const cards = [...wrap.children];
@@ -328,3 +308,4 @@
 })();
 </script>
 @endpush
+

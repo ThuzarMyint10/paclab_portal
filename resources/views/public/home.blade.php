@@ -19,7 +19,7 @@
             <div class="card-body">
                 <div class="action-icon bg-success-subtle text-success mb-3">₱</div>
                 <h5 class="text-navy">New Price Request</h5>
-                <p class="text-muted small mb-0">Choose your samples and tests from our 2026 price list and submit an enquiry.</p>
+                <p class="text-muted small mb-0">Choose your samples and tests from our available test list and submit an enquiry.</p>
             </div>
         </a>
     </div>

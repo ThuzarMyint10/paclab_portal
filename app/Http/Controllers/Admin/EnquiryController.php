@@ -58,7 +58,7 @@ class EnquiryController extends Controller
             'nextStep' => $nextStep,
             'trackingStatuses' => TrackingStatus::where('is_manual', true)->where('is_active', true)->orderBy('sort_order')->get(),
             'companies' => Company::where('is_active', true)->orderBy('name')->get(['id', 'name', 'discount_percent', 'payment_terms', 'currency']),
-            'testsJson' => PublicEnquiryController::testsForPicker(),
+            'testsJson' => PublicEnquiryController::testsForPicker(true),
         ]);
     }
 
